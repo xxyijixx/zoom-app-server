@@ -2,6 +2,42 @@ package models
 
 import "time"
 
+// CommonResponse 通用API响应结构
+type CommonResponse struct {
+	Code    int         `json:"code"`    // 状态码：200成功，其他为错误码
+	Message string      `json:"message"` // 响应消息
+	Data    interface{} `json:"data"`    // 响应数据
+	Success bool        `json:"success"` // 是否成功
+}
+
+// NewSuccessResponse 创建成功响应
+func NewSuccessResponse(data interface{}, message ...string) *CommonResponse {
+	msg := "操作成功"
+	if len(message) > 0 && message[0] != "" {
+		msg = message[0]
+	}
+	return &CommonResponse{
+		Code:    200,
+		Message: msg,
+		Data:    data,
+		Success: true,
+	}
+}
+
+// NewErrorResponse 创建错误响应
+func NewErrorResponse(code int, message string, data ...interface{}) *CommonResponse {
+	var responseData interface{}
+	if len(data) > 0 {
+		responseData = data[0]
+	}
+	return &CommonResponse{
+		Code:    code,
+		Message: message,
+		Data:    responseData,
+		Success: false,
+	}
+}
+
 // ZoomSignatureRequest JWT签名请求
 type ZoomSignatureRequest struct {
 	MeetingNumber string `json:"meetingNumber"`

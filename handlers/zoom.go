@@ -8,6 +8,7 @@ import (
 	"zoom-app-server/config"
 	"zoom-app-server/models"
 	"zoom-app-server/services"
+	"zoom-app-server/utils/response"
 )
 
 // ZoomHandler Zoom处理器
@@ -28,45 +29,43 @@ func NewZoomHandler(cfg *config.Config, zoomService *services.ZoomService) *Zoom
 func (h *ZoomHandler) HandleGenerateSignature(w http.ResponseWriter, r *http.Request) {
 	var req models.ZoomSignatureRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		response.WriteBadRequest(w, "请求参数格式错误")
 		return
 	}
 
 	signature, err := h.zoomService.GenerateSignature(req.MeetingNumber, req.Role)
 	if err != nil {
-		http.Error(w, "Failed to generate signature", http.StatusInternalServerError)
+		response.WriteInternalError(w, "生成签名失败")
 		return
 	}
 
-	response := models.ZoomSignatureResponse{
+	responseData := models.ZoomSignatureResponse{
 		Signature: signature,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.WriteSuccess(w, responseData, "签名生成成功")
 }
 
 // HandleGetConfig 处理获取配置请求
 func (h *ZoomHandler) HandleGetConfig(w http.ResponseWriter, r *http.Request) {
-	response := models.ConfigResponse{
+	responseData := models.ConfigResponse{
 		DisableJoinMeeting: h.cfg.DisableJoinMeeting,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	response.WriteSuccess(w, responseData, "获取配置成功")
 }
 
 // HandleCreateMeeting 处理创建会议请求
 func (h *ZoomHandler) HandleCreateMeeting(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateMeetingRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		response.WriteBadRequest(w, "请求参数格式错误")
 		return
 	}
 	
 	// 验证必要的OAuth配置
 	if h.cfg.ZoomAccountID == "" || h.cfg.ZoomClientID == "" || h.cfg.ZoomClientSecret == "" {
-		http.Error(w, "Server-To-Server OAuth not configured", http.StatusInternalServerError)
+		response.WriteInternalError(w, "服务器OAuth配置未完成")
 		return
 	}
 	
@@ -93,7 +92,7 @@ func (h *ZoomHandler) HandleCreateMeeting(w http.ResponseWriter, r *http.Request
 	tokenResp, err := h.zoomService.GetOAuthToken()
 	if err != nil {
 		log.Printf("Failed to get OAuth token: %v", err)
-		http.Error(w, "Failed to authenticate with Zoom", http.StatusInternalServerError)
+		response.WriteInternalError(w, "Zoom认证失败")
 		return
 	}
 	
@@ -101,10 +100,9 @@ func (h *ZoomHandler) HandleCreateMeeting(w http.ResponseWriter, r *http.Request
 	meetingResp, err := h.zoomService.CreateMeeting(tokenResp.AccessToken, &req)
 	if err != nil {
 		log.Printf("Failed to create meeting: %v", err)
-		http.Error(w, "Failed to create meeting", http.StatusInternalServerError)
+		response.WriteInternalError(w, "创建会议失败")
 		return
 	}
 	
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(meetingResp)
+	response.WriteSuccess(w, meetingResp, "会议创建成功")
 }

@@ -1,13 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import JoinMeeting from './components/JoinMeeting'
 import CreateMeeting from './components/CreateMeeting'
 import ZoomMeeting from './components/ZoomMeeting'
 import LeaveMeeting from './components/LeaveMeeting'
-
-interface ConfigResponse {
-  disable_join_meeting: boolean;
-}
+import type { ConfigResponse } from './types/api'
+import { ApiError } from './types/api'
+import { apiGet } from './utils/api'
 
 function App() {
   const [config, setConfig] = useState<ConfigResponse | null>(null);
@@ -16,13 +15,13 @@ function App() {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const response = await fetch('/api/config');
-        if (response.ok) {
-          const configData: ConfigResponse = await response.json();
-          setConfig(configData);
-        }
+        const configData = await apiGet<ConfigResponse>('/api/config');
+        setConfig(configData);
       } catch (err) {
         console.error('Failed to fetch config:', err);
+        if (err instanceof ApiError) {
+          console.error('API Error:', err.code, err.message);
+        }
       } finally {
         setIsLoading(false);
       }

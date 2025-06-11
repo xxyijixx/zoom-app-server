@@ -5,13 +5,12 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app/web
 
 # 复制前端package文件
-COPY web/package*.json ./
-
-# 安装前端依赖
-RUN npm ci --only=production
-
+# COPY web/package*.json ./
 # 复制前端源码
 COPY web/ ./
+
+# 安装前端依赖
+RUN npm ci
 
 # 构建前端
 RUN npm run build

@@ -2,38 +2,23 @@ version: '3.8'
 
 services:
   zoom-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: zoom-service:latest
     ports:
-      - "80:80"
+      - "8808:80"
     environment:
       # Zoom API配置 - 请在.env文件中设置或通过环境变量传入
-      - ZOOM_API_KEY=${ZOOM_API_KEY}
-      - ZOOM_API_SECRET=${ZOOM_API_SECRET}
+      # - ZOOM_API_KEY=${ZOOM_API_KEY}
+      # - ZOOM_API_SECRET=${ZOOM_API_SECRET}
       - ZOOM_ACCOUNT_ID=${ZOOM_ACCOUNT_ID}
       - ZOOM_CLIENT_ID=${ZOOM_CLIENT_ID}
       - ZOOM_CLIENT_SECRET=${ZOOM_CLIENT_SECRET}
-      # 服务器配置
-      - PORT=8080
       # 功能开关
-      - DISABLE_JOIN_MEETING=${DISABLE_JOIN_MEETING:-false}
-      # DooTask 验证配置
-      - DOOTASK_URL=${DOOTASK_URL}
-      - DOOTASK_TIMEOUT=${DOOTASK_TIMEOUT:-10}
-      - DISABLE_DOOTASK_AUTH=${DISABLE_DOOTASK_AUTH:-false}
+      - DISABLE_JOIN_MEETING=true
+      - DISABLE_DOOTASK_AUTH=true
     volumes:
       # 可选：挂载日志目录
       - ./logs:/var/log/supervisor
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-# 可选：如果需要持久化日志
-volumes:
-  logs:
-    driver: local

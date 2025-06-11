@@ -28,10 +28,6 @@ dist/
 *.log
 *.tmp
 
-# Go-specific
-/go.sum
-/go.mod
-
 # Web specific
 web/node_modules
 web/dist

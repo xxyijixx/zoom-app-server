@@ -1,27 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface CreateMeetingRequest {
-  topic: string;
-  type: number;
-  start_time?: string;
-  duration?: number;
-  timezone?: string;
-  password?: string;
-  agenda?: string;
-}
-
-interface CreateMeetingResponse {
-  id: string;
-  topic: string;
-  join_url: string;
-  password: string;
-  start_time: string;
-}
-
-interface ConfigResponse {
-  disable_join_meeting: boolean;
-}
+import type {
+  CreateMeetingRequest,
+  CreateMeetingResponse,
+  ConfigResponse
+} from '../types/api';
+import { ApiError } from '../types/api';
+import { apiGet, apiPost } from '../utils/api';
 
 const CreateMeeting: React.FC = () => {
   const navigate = useNavigate();
@@ -41,13 +26,13 @@ const CreateMeeting: React.FC = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const response = await fetch('/api/config');
-        if (response.ok) {
-          const configData: ConfigResponse = await response.json();
-          setConfig(configData);
-        }
+        const configData = await apiGet<ConfigResponse>('/api/config');
+        setConfig(configData);
       } catch (err) {
         console.error('Failed to fetch config:', err);
+        if (err instanceof ApiError) {
+          console.error('API Error:', err.code, err.message);
+        }
       }
     };
     fetchConfig();
@@ -91,19 +76,7 @@ const CreateMeeting: React.FC = () => {
         requestData.agenda = agenda.trim();
       }
 
-      const response = await fetch('/api/meetings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`创建会议失败: ${response.status} ${response.statusText}`);
-      }
-
-      const meetingData: CreateMeetingResponse = await response.json();
+      const meetingData = await apiPost<CreateMeetingResponse>('/api/meetings', requestData);
       setCreatedMeeting(meetingData);
       
       // 可选：自动跳转到加入会议页面
@@ -111,7 +84,11 @@ const CreateMeeting: React.FC = () => {
       
     } catch (err) {
       console.error('创建会议错误:', err);
-      setError(err instanceof Error ? err.message : '创建会议失败，请重试');
+      if (err instanceof ApiError) {
+        setError(`创建会议失败: ${err.message}`);
+      } else {
+        setError(err instanceof Error ? err.message : '创建会议失败，请重试');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -364,12 +341,12 @@ const CreateMeeting: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <input
                         type="text"
-                        value={createdMeeting.id}
+                        value={createdMeeting.id.toString()}
                         readOnly
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                       />
                       <button
-                        onClick={() => copyToClipboard(createdMeeting.id)}
+                        onClick={() => copyToClipboard(createdMeeting.id.toString())}
                         className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
                         复制
