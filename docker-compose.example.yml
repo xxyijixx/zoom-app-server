@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  zoom-app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      # 基础URL配置 - 用于部署在子路径的情况
+      - BASE_URL=
+      # API基础路径
+      - API_BASE_URL=/api
+      # 应用标题
+      - APP_TITLE=Zoom Meeting App
+      # 环境标识
+      - ENV=production
+    volumes:
+      # 可选：挂载日志目录
+      - ./logs:/var/log/nginx
+    restart: unless-stopped
+
+  # 示例：使用子路径部署
+  zoom-app-subpath:
+    build: .
+    ports:
+      - "8081:80"
+    environment:
+      # 部署在 /zoom-app 子路径下
+      - BASE_URL=/zoom-app
+      - API_BASE_URL=/zoom-app/api
+      - APP_TITLE=Zoom App (SubPath)
+      - ENV=production
+    restart: unless-stopped
+
+  # 示例：使用自定义域名
+  zoom-app-custom:
+    build: .
+    ports:
+      - "8082:80"
+    environment:
+      # 使用完整的基础URL
+      - BASE_URL=https://zoom.example.com
+      - API_BASE_URL=https://zoom.example.com/api
+      - APP_TITLE=Enterprise Zoom App
+      - ENV=production
+    restart: unless-stopped

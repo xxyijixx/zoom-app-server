@@ -1,5 +1,6 @@
 import type { ApiResponse } from '../types/api';
 import { ApiError } from '../types/api';
+import { getApiUrl } from './config';
 
 // API请求配置
 interface RequestConfig {
@@ -33,8 +34,11 @@ export async function apiRequest<T = any>(
     requestConfig.body = JSON.stringify(body);
   }
 
+  // 使用配置工具函数构建完整的API URL
+  const fullUrl = url.startsWith('http') ? url : getApiUrl(url.replace(/^\/api\/?/, ''));
+
   try {
-    const response = await fetch(url, requestConfig);
+    const response = await fetch(fullUrl, requestConfig);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

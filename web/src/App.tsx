@@ -7,12 +7,16 @@ import LeaveMeeting from './components/LeaveMeeting'
 import type { ConfigResponse } from './types/api'
 import { ApiError } from './types/api'
 import { apiGet } from './utils/api'
+import { getAppTitle } from './utils/config'
 
 function App() {
   const [config, setConfig] = useState<ConfigResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // 设置页面标题
+    document.title = getAppTitle();
+    
     const fetchConfig = async () => {
       try {
         const configData = await apiGet<ConfigResponse>('/api/config');

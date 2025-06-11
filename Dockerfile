@@ -48,6 +48,11 @@ RUN mkdir -p /app
 # 复制构建好的后端二进制文件
 COPY --from=backend-builder /app/zoom-app-server /app/
 
+# 复制配置注入脚本和启动脚本
+COPY scripts/inject-config.sh /usr/local/bin/
+COPY scripts/entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/inject-config.sh /usr/local/bin/entrypoint.sh
+
 # 复制构建好的前端文件到nginx目录
 COPY --from=frontend-builder /app/web/dist /usr/share/nginx/html
 
@@ -60,5 +65,5 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # 暴露端口
 EXPOSE 80
 
-# 使用supervisor启动nginx和后端服务
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# 设置启动脚本为入口点
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
