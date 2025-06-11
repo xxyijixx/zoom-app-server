@@ -32,10 +32,6 @@ dist/
 /go.sum
 /go.mod
 
-# Docker
-Dockerfile
-.dockerignore
-
 # Web specific
 web/node_modules
 web/dist

@@ -18,6 +18,10 @@ services:
       - PORT=8080
       # 功能开关
       - DISABLE_JOIN_MEETING=${DISABLE_JOIN_MEETING:-false}
+      # DooTask 验证配置
+      - DOOTASK_URL=${DOOTASK_URL}
+      - DOOTASK_TIMEOUT=${DOOTASK_TIMEOUT:-10}
+      - DISABLE_DOOTASK_AUTH=${DISABLE_DOOTASK_AUTH:-false}
     volumes:
       # 可选：挂载日志目录
       - ./logs:/var/log/supervisor

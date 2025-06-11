@@ -1,0 +1,64 @@
+web/node_modules
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+API.md
+
+# Node modules and build artifacts
+web/node_modules
+web/dist
+
+# Go build artifacts
+zoom-app-server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Dependency directories
+vendor/
+
+# Temporary folders
+tmp/
+temp/
+
+# Docker files (exclude from build context)
+Dockerfile
+docker-compose.yml

@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -13,11 +14,15 @@ type Config struct {
 	ZoomAPISecret string
 	Port          string
 	// Server-To-Server OAuth 配置
-	ZoomAccountID     string
-	ZoomClientID      string
-	ZoomClientSecret  string
+	ZoomAccountID    string
+	ZoomClientID     string
+	ZoomClientSecret string
 	// 功能开关
 	DisableJoinMeeting bool
+	// DooTask 验证配置
+	DooTaskURL         string
+	DooTaskTimeout     int
+	DisableDooTaskAuth bool
 }
 
 // LoadConfig 从环境变量加载配置
@@ -32,20 +37,23 @@ func LoadConfig() *Config {
 		ZoomAPISecret: getEnv("ZOOM_API_SECRET", ""),
 		Port:          getEnv("PORT", "8080"),
 		// Server-To-Server OAuth 配置
-		ZoomAccountID:     getEnv("ZOOM_ACCOUNT_ID", ""),
-		ZoomClientID:      getEnv("ZOOM_CLIENT_ID", ""),
-		ZoomClientSecret:  getEnv("ZOOM_CLIENT_SECRET", ""),
+		ZoomAccountID:    getEnv("ZOOM_ACCOUNT_ID", ""),
+		ZoomClientID:     getEnv("ZOOM_CLIENT_ID", ""),
+		ZoomClientSecret: getEnv("ZOOM_CLIENT_SECRET", ""),
 		// 功能开关
 		DisableJoinMeeting: getEnv("DISABLE_JOIN_MEETING", "false") == "true",
+		// DooTask 验证配置
+		DooTaskURL:         getEnv("DOOTASK_URL", "http://nginx"),
+		DooTaskTimeout:     getEnvAsInt("DOOTASK_TIMEOUT", 10),
+		DisableDooTaskAuth: getEnv("DISABLE_DOOTASK_AUTH", "false") == "true",
 	}
 	if !config.DisableJoinMeeting {
-// 验证必要的配置
-if config.ZoomAPIKey == "" || config.ZoomAPISecret == "" {
-	log.Fatal("ZOOM_API_KEY and ZOOM_API_SECRET must be set")
-}
+		// 验证必要的配置
+		if config.ZoomAPIKey == "" || config.ZoomAPISecret == "" {
+			log.Fatal("ZOOM_API_KEY and ZOOM_API_SECRET must be set")
+		}
 	}
-	
-	
+
 	// 验证Server-To-Server OAuth配置（用于创建会议）
 	if config.ZoomAccountID == "" || config.ZoomClientID == "" || config.ZoomClientSecret == "" {
 		log.Println("Warning: ZOOM_ACCOUNT_ID, ZOOM_CLIENT_ID, and ZOOM_CLIENT_SECRET should be set for Server-To-Server OAuth")
@@ -61,4 +69,16 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+// getEnvAsInt 获取整数类型的环境变量，如果不存在或转换失败则返回默认值
+func getEnvAsInt(key string, defaultValue int) int {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	if intValue, err := strconv.Atoi(value); err == nil {
+		return intValue
+	}
+	return defaultValue
 }
