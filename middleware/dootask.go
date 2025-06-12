@@ -8,11 +8,12 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	
-	"github.com/sirupsen/logrus"
+
 	"zoom-app-server/config"
 	"zoom-app-server/utils/common"
 	"zoom-app-server/utils/logger"
+
+	"github.com/sirupsen/logrus"
 )
 
 // DooTaskAuthResponse DooTask验证响应结构
@@ -93,7 +94,7 @@ func (m *DooTaskMiddleware) AuthMiddleware(next http.Handler) http.Handler {
 			"path":   r.URL.Path,
 			"remote": r.RemoteAddr,
 		}).Debug("Processing DooTask auth middleware")
-		
+
 		// 如果禁用了DooTask验证，直接通过
 		if m.cfg.DisableDooTaskAuth {
 			logger.Debug("DooTask auth disabled, skipping validation")
@@ -112,15 +113,15 @@ func (m *DooTaskMiddleware) AuthMiddleware(next http.Handler) http.Handler {
 		logger.WithField("token_length", len(token)).Debug("Validating DooTask token")
 		userInfo, err := m.validateToken(token)
 		if err != nil {
-			logger.WithError(err).Error("DooTask token validation failed")
+			logger.WithError(err).Error("DooTask token validation failed", err.Error())
 			m.respondWithError(w, "Invalid token", http.StatusUnauthorized)
 			return
 		}
-		
+
 		logger.WithFields(logrus.Fields{
-			"user_id": userInfo.Userid,
+			"user_id":  userInfo.Userid,
 			"nickname": userInfo.Nickname,
-			"email": userInfo.Email,
+			"email":    userInfo.Email,
 		}).Info("DooTask token validation successful")
 
 		// // 将用户信息添加到请求上下文中
@@ -155,12 +156,12 @@ func (m *DooTaskMiddleware) extractToken(r *http.Request) string {
 // validateToken 验证token
 func (m *DooTaskMiddleware) validateToken(token string) (*UserInfoResp, error) {
 	// 构建验证URL
-	validateURL := fmt.Sprintf("%s%s?token=%s", m.cfg.DooTaskURL, "/api/user/info", token)
-	
+	validateURL := fmt.Sprintf("%s%s?token=%s", m.cfg.DooTaskURL, "/api/users/info", token)
+
 	logger.WithFields(logrus.Fields{
 		"dootask_url": m.cfg.DooTaskURL,
-		"timeout": m.cfg.DooTaskTimeout,
-	}).Debug("Sending token validation request to DooTask")
+		"timeout":     m.cfg.DooTaskTimeout,
+	}).Info("Sending token validation request to DooTask")
 
 	// 创建HTTP客户端
 	client := &http.Client{
@@ -206,6 +207,7 @@ func (m *DooTaskMiddleware) respondWithError(w http.ResponseWriter, message stri
 
 // 解码并检查返回数据
 func (d *DooTaskMiddleware) UnmarshalAndCheckResponse(resp []byte) (map[string]interface{}, error) {
+	logger.Info("Resp", string(resp))
 	var ret map[string]interface{}
 	if err := json.Unmarshal(resp, &ret); err != nil {
 		// return nil, e.NewErrorWithDetail(constant.ErrDooTaskUnmarshalResponse, err, nil)

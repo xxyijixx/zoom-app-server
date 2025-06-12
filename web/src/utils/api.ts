@@ -1,5 +1,6 @@
 import type { ApiResponse } from '../types/api';
 import { ApiError } from '../types/api';
+import { props } from '@dootask/tools'
 
 const basePath = import.meta.env.VITE_BASE_PATH
 
@@ -25,6 +26,13 @@ export async function apiRequest<T = any>(
     'Content-Type': 'application/json',
     ...headers
   };
+
+  if (props.userToken) {
+    const token = props.userToken
+    if (token) {
+      requestHeaders['Token'] = `${token}`
+    }
+  }
 
   const requestConfig: RequestInit = {
     method,

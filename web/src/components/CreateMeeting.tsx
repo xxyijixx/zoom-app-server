@@ -147,12 +147,59 @@ const CreateMeeting: React.FC = () => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert('已复制到剪贴板');
-    }).catch(() => {
-      alert('复制失败，请手动复制');
-    });
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
+
+  const copyToClipboard = async (text: string, label?: string) => {
+    try {
+      // 首先尝试使用现代 Clipboard API
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        setCopySuccess(label || '内容');
+        setTimeout(() => setCopySuccess(null), 2000);
+        return;
+      }
+      
+      
+      // 降级方案：使用传统的 document.execCommand
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        setCopySuccess(label || '内容');
+        setTimeout(() => setCopySuccess(null), 2000);
+      } else {
+        throw new Error('execCommand failed');
+      }
+    } catch (err) {
+      console.error('复制失败:', err);
+       // 显示更友好的错误提示
+       setCopySuccess(`复制失败，请手动复制${label || '内容'}`);
+       setTimeout(() => setCopySuccess(null), 3000);
+     }
+   };
+
+  const copyAllMeetingInfo = () => {
+    if (!createdMeeting) return;
+    
+    const meetingInfo = `会议邀请
+
+会议主题：${createdMeeting.topic}
+会议ID：${createdMeeting.id}
+会议密码：${createdMeeting.password}
+加入链接：${createdMeeting.join_url}
+
+请点击链接加入会议，或手动输入会议ID和密码。`;
+    
+    copyToClipboard(meetingInfo, '会议信息');
   };
 
   return (
@@ -341,6 +388,32 @@ const CreateMeeting: React.FC = () => {
                   <p className="text-green-600 text-sm">您的会议已成功创建，可以开始邀请参与者了。</p>
                 </div>
 
+                {/* 复制成功提示 */}
+                {copySuccess && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-blue-600 text-sm text-center">✓ {copySuccess}已复制到剪贴板</p>
+                  </div>
+                )}
+
+                {/* 一键复制所有会议信息 */}
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-800">分享会议信息</h4>
+                      <p className="text-xs text-gray-600 mt-1">一键复制完整的会议邀请信息</p>
+                    </div>
+                    <button
+                      onClick={copyAllMeetingInfo}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span>复制邀请</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">会议主题</label>
@@ -352,7 +425,7 @@ const CreateMeeting: React.FC = () => {
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                       />
                       <button
-                        onClick={() => copyToClipboard(createdMeeting.topic)}
+                        onClick={() => copyToClipboard(createdMeeting.topic, '会议主题')}
                         className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
                         复制
@@ -370,7 +443,7 @@ const CreateMeeting: React.FC = () => {
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                       />
                       <button
-                        onClick={() => copyToClipboard(createdMeeting.id.toString())}
+                        onClick={() => copyToClipboard(createdMeeting.id.toString(), '会议ID')}
                         className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
                         复制
@@ -388,7 +461,7 @@ const CreateMeeting: React.FC = () => {
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
                       />
                       <button
-                        onClick={() => copyToClipboard(createdMeeting.password)}
+                        onClick={() => copyToClipboard(createdMeeting.password, '会议密码')}
                         className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
                         复制
@@ -406,7 +479,7 @@ const CreateMeeting: React.FC = () => {
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm"
                       />
                       <button
-                        onClick={() => copyToClipboard(createdMeeting.join_url)}
+                        onClick={() => copyToClipboard(createdMeeting.join_url, '加入链接')}
                         className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                       >
                         复制
