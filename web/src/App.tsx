@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import JoinMeeting from './components/JoinMeeting'
 import CreateMeeting from './components/CreateMeeting'
 import ZoomMeeting from './components/ZoomMeeting'
 import LeaveMeeting from './components/LeaveMeeting'
+import { ErrorProvider } from './contexts/ErrorContext'
+import ApiErrorInitializer from './components/ApiErrorInitializer'
 import type { ConfigResponse } from './types/api'
 import { ApiError } from './types/api'
 import { apiGet } from './utils/api'
@@ -49,15 +51,19 @@ function App() {
   const basename = basePath === '/' ? '' : basePath.replace(/\/$/, '');
 
   return (
-    <Router basename={basename}>
-      <Routes>
-        <Route path="/" element={<Navigate to={defaultRoute} replace />} />
-        {shouldShowJoinMeeting && <Route path="/join" element={<JoinMeeting />} />}
-        <Route path="/create" element={<CreateMeeting />} />
-        <Route path="/meeting" element={<ZoomMeeting />} />
-        <Route path="/leave" element={<LeaveMeeting />} />
-      </Routes>
-    </Router>
+    <ErrorProvider>
+      <ApiErrorInitializer>
+        <Router basename={basename}>
+          <Routes>
+            <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+            {shouldShowJoinMeeting && <Route path="/join" element={<JoinMeeting />} />}
+            <Route path="/create" element={<CreateMeeting />} />
+            <Route path="/meeting" element={<ZoomMeeting />} />
+            <Route path="/leave" element={<LeaveMeeting />} />
+          </Routes>
+        </Router>
+      </ApiErrorInitializer>
+    </ErrorProvider>
   )
 }
 
