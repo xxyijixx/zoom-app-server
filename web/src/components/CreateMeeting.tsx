@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 import type {
   CreateMeetingRequest,
   CreateMeetingResponse,
@@ -203,29 +204,35 @@ const CreateMeeting: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8 relative">
-          {/* 右上角跳转按钮 */}
-          {shouldShowJoinMeeting && (
-            <button
-              onClick={() => navigate('/join')}
-              className="absolute top-4 right-4 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors duration-200 flex items-center space-x-1"
-            >
-              <span>加入会议</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-            </button>
-          )}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 relative">
+          {/* 右上角按钮组 */}
+          <div className="absolute top-4 right-4 flex items-center space-x-4">
+            {/* 主题切换按钮 */}
+            <ThemeToggle />
+            
+            {/* 加入会议按钮 */}
+            {shouldShowJoinMeeting && (
+              <button
+                onClick={() => navigate('/join')}
+                className="text-green-600 hover:text-green-700 text-sm font-medium transition-colors duration-200 flex items-center space-x-1"
+              >
+                <span>加入会议</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            )}
+          </div>
           
           <div>
-            <h2 className="text-2xl font-semibold text-center text-gray-800 mb-8">创建 Zoom 会议</h2>
+            <h2 className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-8">创建 Zoom 会议</h2>
             
             {!createdMeeting ? (
               <div className="space-y-6">
                 <div>
-                  <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="topic" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     会议主题 *
                   </label>
                   <input
@@ -233,21 +240,21 @@ const CreateMeeting: React.FC = () => {
                     id="topic"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                     placeholder="请输入会议主题"
                     disabled={isLoading}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     会议类型
                   </label>
                   <select
                     id="type"
                     value={type}
                     onChange={(e) => setType(Number(e.target.value))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                     disabled={isLoading}
                   >
                     <option value={1}>即时会议</option>
@@ -259,7 +266,7 @@ const CreateMeeting: React.FC = () => {
                 {type === 2 && (
                   <>
                     <div>
-                      <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         开始时间 *
                       </label>
                       <input
@@ -268,20 +275,20 @@ const CreateMeeting: React.FC = () => {
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
                         min={new Date().toISOString().slice(0, 16)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                         disabled={isLoading}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         持续时间（分钟）
                       </label>
                       <select
                         id="duration"
                         value={duration}
                         onChange={(e) => setDuration(Number(e.target.value))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                         disabled={isLoading}
                       >
                         <option value={30}>30分钟</option>
@@ -294,14 +301,14 @@ const CreateMeeting: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         时区
                       </label>
                       <select
                         id="timezone"
                         value={timezone}
                         onChange={(e) => setTimezone(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                         disabled={isLoading}
                       >
                         <option value="Asia/Shanghai">北京时间 (UTC+8)</option>
@@ -317,7 +324,7 @@ const CreateMeeting: React.FC = () => {
 
                 {/* 可选设置 */}
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     会议密码（可选）
                   </label>
                   <input
@@ -325,14 +332,14 @@ const CreateMeeting: React.FC = () => {
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                     placeholder="留空则自动生成"
                     disabled={isLoading}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="agenda" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="agenda" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     会议议程（可选）
                   </label>
                   <textarea
@@ -340,7 +347,7 @@ const CreateMeeting: React.FC = () => {
                     value={agenda}
                     onChange={(e) => setAgenda(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 resize-none"
                     placeholder="请输入会议议程"
                     disabled={isLoading}
                   />
@@ -355,7 +362,7 @@ const CreateMeeting: React.FC = () => {
                 <button
                   onClick={handleCreateMeeting}
                   disabled={isLoading}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
                 >
                   {isLoading ? (
                     <>
@@ -390,8 +397,8 @@ const CreateMeeting: React.FC = () => {
 
                 {/* 复制成功提示 */}
                 {copySuccess && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-blue-600 text-sm text-center">✓ {copySuccess}已复制到剪贴板</p>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-green-600 text-sm text-center">✓ {copySuccess}已复制到剪贴板</p>
                   </div>
                 )}
 
@@ -404,7 +411,7 @@ const CreateMeeting: React.FC = () => {
                     </div>
                     <button
                       onClick={copyAllMeetingInfo}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2"
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center space-x-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />

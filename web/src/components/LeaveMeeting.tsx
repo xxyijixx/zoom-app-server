@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 const LeaveMeeting: React.FC = () => {
   const navigate = useNavigate();
@@ -11,14 +12,18 @@ const LeaveMeeting: React.FC = () => {
     navigate('/join');
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900 dark:to-emerald-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center relative">
+          {/* 右上角主题切换按钮 */}
+          <div className="absolute top-4 right-4">
+            <ThemeToggle />
+          </div>
           {/* 离开会议图标 */}
           <div className="mb-6">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+            <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
               <svg 
-                className="w-8 h-8 text-green-600" 
+                className="w-8 h-8 text-green-600 dark:text-green-300" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -34,11 +39,11 @@ const LeaveMeeting: React.FC = () => {
           </div>
 
           {/* 主要信息 */}
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             已离开会议
           </h2>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
             您已成功离开 Zoom 会议。感谢您的参与！
           </p>
 
@@ -46,22 +51,22 @@ const LeaveMeeting: React.FC = () => {
           <div className="space-y-4">
             <button
               onClick={handleJoinAgain}
-              className="w-full bg-blue-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+              className="w-full bg-green-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200"
             >
               加入新会议
             </button>
             
             <button
               onClick={() => window.close()}
-              className="w-full bg-gray-100 text-gray-700 font-medium py-3 px-4 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200"
+              className="w-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200 font-medium py-3 px-4 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200"
             >
               关闭窗口
             </button>
           </div>
 
           {/* 额外信息 */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               如需技术支持，请联系管理员
             </p>
           </div>

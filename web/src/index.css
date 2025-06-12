@@ -1,5 +1,146 @@
 @import "tailwindcss";
 
+/* 基础样式 */
+:root {
+  --background-light: #ffffff;
+  --text-light: #1f2937;
+  --background-dark: #1f2937;
+  --text-dark: #f3f4f6;
+  --card-light: #ffffff;
+  --card-dark: #374151;
+  --input-bg-light: #ffffff;
+  --input-bg-dark: #374151;
+  --input-border-light: #d1d5db;
+  --input-border-dark: #4b5563;
+  --button-primary-light: #10b981;
+  --button-primary-dark: #059669;
+  --button-secondary-light: #e5e7eb;
+  --button-secondary-dark: #4b5563;
+  --gradient-from-light: #ecfdf5;
+  --gradient-to-light: #d1fae5;
+  --gradient-from-dark: #064e3b;
+  --gradient-to-dark: #065f46;
+}
+
+/* 暗黑模式过渡效果 */
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 表单元素样式 */
+input, select, textarea {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  background-color: var(--input-bg-light);
+  color: var(--text-light);
+  border-color: var(--input-border-light);
+}
+
+/* 按钮样式 */
+button {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 主按钮 */
+.btn-primary {
+  @apply bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600;
+}
+
+/* 次要按钮 */
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+}
+
+/* 渐变背景 */
+.gradient-bg-light {
+  @apply bg-gradient-to-br from-green-50 to-emerald-100;
+}
+
+.gradient-bg-dark {
+  @apply bg-gradient-to-br from-green-900 to-emerald-900;
+}
+
+/* 亮色模式（默认） */
+body {
+  background-color: var(--background-light);
+  color: var(--text-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 暗色模式 */
+.dark body {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
+
+/* 卡片样式 */
+.bg-white {
+  background-color: var(--card-light);
+  transition: background-color 0.3s ease;
+}
+
+.dark .bg-white {
+  background-color: var(--card-dark);
+}
+
+/* 输入框样式 */
+input, select, textarea {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark input, .dark select, .dark textarea {
+  background-color: var(--input-bg-dark);
+  border-color: var(--input-border-dark);
+  color: var(--text-dark);
+}
+
+/* 按钮样式 */
+.dark .bg-blue-600 {
+  background-color: var(--button-primary-dark);
+}
+
+.dark .bg-green-600 {
+  background-color: #059669;
+}
+
+.dark .bg-gray-100 {
+  background-color: var(--button-secondary-dark);
+  color: #e5e7eb;
+}
+
+/* 渐变背景 */
+.dark .bg-gradient-to-br.from-blue-50.to-indigo-100 {
+  background-image: linear-gradient(to bottom right, var(--gradient-from-dark), var(--gradient-to-dark));
+}
+
+.dark .bg-gradient-to-br.from-green-50.to-emerald-100 {
+  background-image: linear-gradient(to bottom right, #064e3b, #065f46);
+}
+
+/* 文本颜色 */
+.dark .text-gray-700 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af;
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+/* 边框颜色 */
+.dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151;
+}
 
 #zmmtg-root {
   display: none;
