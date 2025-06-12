@@ -22,7 +22,7 @@ const CreateMeeting: React.FC = () => {
   const [createdMeeting, setCreatedMeeting] = useState<CreateMeetingResponse | null>(null);
   const [config, setConfig] = useState<ConfigResponse | null>(null);
 
-  // 获取服务器配置
+  // 获取服务器配置和已保存的会议信息
   useEffect(() => {
     const fetchConfig = async () => {
       try {
@@ -35,7 +35,24 @@ const CreateMeeting: React.FC = () => {
         }
       }
     };
+    
+    // 检查是否有已保存的会议信息
+    const loadSavedMeeting = () => {
+      try {
+        const savedMeeting = localStorage.getItem('created_meeting_info');
+        if (savedMeeting) {
+          const meetingData = JSON.parse(savedMeeting);
+          setCreatedMeeting(meetingData);
+        }
+      } catch (err) {
+        console.error('Failed to load saved meeting:', err);
+        // 如果解析失败，清除无效数据
+        localStorage.removeItem('created_meeting_info');
+      }
+    };
+    
     fetchConfig();
+    loadSavedMeeting();
   }, []);
 
   // 检查是否应该显示加入会议功能
@@ -78,6 +95,13 @@ const CreateMeeting: React.FC = () => {
 
       const meetingData = await apiPost<CreateMeetingResponse>('/api/meetings', requestData);
       setCreatedMeeting(meetingData);
+      
+      // 保存会议信息到 localStorage
+      try {
+        localStorage.setItem('created_meeting_info', JSON.stringify(meetingData));
+      } catch (err) {
+        console.error('Failed to save meeting info:', err);
+      }
       
       // 可选：自动跳转到加入会议页面
       // navigate('/join');
@@ -400,6 +424,7 @@ const CreateMeeting: React.FC = () => {
                   </button>
                   <button
                     onClick={() => {
+                      // 清除当前会议状态
                       setCreatedMeeting(null);
                       setTopic('');
                       setType(1);
@@ -409,6 +434,13 @@ const CreateMeeting: React.FC = () => {
                       setPassword('');
                       setAgenda('');
                       setError(null);
+                      
+                      // 清除localStorage中保存的会议信息
+                      try {
+                        localStorage.removeItem('created_meeting_info');
+                      } catch (err) {
+                        console.error('Failed to clear saved meeting info:', err);
+                      }
                     }}
                     className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
                   >
