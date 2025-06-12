@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
+	
+	"github.com/sirupsen/logrus"
 	"zoom-app-server/config"
 	"zoom-app-server/utils/common"
+	"zoom-app-server/utils/logger"
 )
 
 // DooTaskAuthResponse DooTask验证响应结构
@@ -86,8 +88,15 @@ func NewDooTaskMiddleware(cfg *config.Config) *DooTaskMiddleware {
 // AuthMiddleware DooTask认证中间件
 func (m *DooTaskMiddleware) AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger.WithFields(logrus.Fields{
+			"method": r.Method,
+			"path":   r.URL.Path,
+			"remote": r.RemoteAddr,
+		}).Debug("Processing DooTask auth middleware")
+		
 		// 如果禁用了DooTask验证，直接通过
 		if m.cfg.DisableDooTaskAuth {
+			logger.Debug("DooTask auth disabled, skipping validation")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -100,12 +109,19 @@ func (m *DooTaskMiddleware) AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		// 验证token
+		logger.WithField("token_length", len(token)).Debug("Validating DooTask token")
 		userInfo, err := m.validateToken(token)
 		if err != nil {
-			log.Printf("DooTask token validation failed: %v", err)
+			logger.WithError(err).Error("DooTask token validation failed")
 			m.respondWithError(w, "Invalid token", http.StatusUnauthorized)
 			return
 		}
+		
+		logger.WithFields(logrus.Fields{
+			"user_id": userInfo.Userid,
+			"nickname": userInfo.Nickname,
+			"email": userInfo.Email,
+		}).Info("DooTask token validation successful")
 
 		// // 将用户信息添加到请求上下文中
 		r.Header.Set("X-User-ID", fmt.Sprintf("%d", userInfo.Userid))
@@ -140,6 +156,11 @@ func (m *DooTaskMiddleware) extractToken(r *http.Request) string {
 func (m *DooTaskMiddleware) validateToken(token string) (*UserInfoResp, error) {
 	// 构建验证URL
 	validateURL := fmt.Sprintf("%s%s?token=%s", m.cfg.DooTaskURL, "/api/user/info", token)
+	
+	logger.WithFields(logrus.Fields{
+		"dootask_url": m.cfg.DooTaskURL,
+		"timeout": m.cfg.DooTaskTimeout,
+	}).Debug("Sending token validation request to DooTask")
 
 	// 创建HTTP客户端
 	client := &http.Client{
@@ -149,6 +170,7 @@ func (m *DooTaskMiddleware) validateToken(token string) (*UserInfoResp, error) {
 	// 发送验证请求
 	resp, err := client.Get(validateURL)
 	if err != nil {
+		logger.WithError(err).WithField("dootask_url", m.cfg.DooTaskURL).Error("Failed to send validation request to DooTask")
 		return nil, fmt.Errorf("failed to validate token: %w", err)
 	}
 	defer resp.Body.Close()

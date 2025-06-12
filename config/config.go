@@ -23,6 +23,11 @@ type Config struct {
 	DooTaskURL         string
 	DooTaskTimeout     int
 	DisableDooTaskAuth bool
+	// 日志配置
+	LogLevel    string
+	LogFormat   string
+	LogOutput   string
+	LogFilePath string
 }
 
 // LoadConfig 从环境变量加载配置
@@ -46,6 +51,11 @@ func LoadConfig() *Config {
 		DooTaskURL:         getEnv("DOOTASK_URL", "http://nginx"),
 		DooTaskTimeout:     getEnvAsInt("DOOTASK_TIMEOUT", 10),
 		DisableDooTaskAuth: getEnv("DISABLE_DOOTASK_AUTH", "false") == "true",
+		// 日志配置
+		LogLevel:    getEnv("LOG_LEVEL", "info"),
+		LogFormat:   getEnv("LOG_FORMAT", "text"),
+		LogOutput:   getEnv("LOG_OUTPUT", "file"),
+		LogFilePath: getEnv("LOG_FILE_PATH", "logs/app.log"),
 	}
 	if !config.DisableJoinMeeting {
 		// 验证必要的配置
