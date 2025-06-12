@@ -1,6 +1,8 @@
 import type { ApiResponse } from '../types/api';
 import { ApiError } from '../types/api';
 
+const basePath = import.meta.env.VITE_BASE_PATH
+
 // API请求配置
 interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -32,7 +34,9 @@ export async function apiRequest<T = any>(
   if (body && method !== 'GET') {
     requestConfig.body = JSON.stringify(body);
   }
-
+  if (basePath && url.startsWith("/")) {
+    url = basePath + url
+  }
   try {
     const response = await fetch(url, requestConfig);
     

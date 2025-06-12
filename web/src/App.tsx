@@ -43,8 +43,13 @@ function App() {
   const shouldShowJoinMeeting = !config?.disable_join_meeting;
   const defaultRoute = shouldShowJoinMeeting ? "/join" : "/create";
 
+  // 获取 base path 用于 Router 的 basename
+  const basePath = import.meta.env.VITE_BASE_PATH || '/';
+  // 确保 basename 不以 / 结尾（除非是根路径）
+  const basename = basePath === '/' ? '' : basePath.replace(/\/$/, '');
+
   return (
-    <Router>
+    <Router basename={basename}>
       <Routes>
         <Route path="/" element={<Navigate to={defaultRoute} replace />} />
         {shouldShowJoinMeeting && <Route path="/join" element={<JoinMeeting />} />}

@@ -12,6 +12,8 @@ COPY web/ ./
 # 安装前端依赖
 RUN npm ci
 
+ENV VITE_BASE_PATH=/apps/zoom-app
+
 # 构建前端
 RUN npm run build
 
