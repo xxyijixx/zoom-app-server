@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfig } from '../contexts/ConfigContext';
 
 const JoinMeeting: React.FC = () => {
   const navigate = useNavigate();
@@ -9,7 +10,8 @@ const JoinMeeting: React.FC = () => {
   const [passWord, setPassWord] = useState('');
   const [zoomLink, setZoomLink] = useState('');
   const [activeTab, setActiveTab] = useState('manual'); // 'manual' 或 'link'
-
+  const { config } = useConfig();
+  
   // 页面加载时自动检测 localStorage
   useEffect(() => {
     const info = localStorage.getItem('zoom_meeting_info');
@@ -40,6 +42,10 @@ const JoinMeeting: React.FC = () => {
   };
 
   const handleJoinMeeting = () => {
+    if (!config || config.disable_join_meeting) {
+      // alert('当前不允许加入会议');
+      return;
+    }
     if (meetingNumber && userName && userEmail && passWord) {
       // 保存会议信息到 localStorage
       const meetingInfo = {
@@ -47,7 +53,7 @@ const JoinMeeting: React.FC = () => {
         userName,
         userEmail,
         passWord,
-        apiKey: 'Wk3vFblYScG8pGoxfVLWhw'
+        apiKey: config?.zoom_api_key || ''
       };
       localStorage.setItem('zoom_meeting_info', JSON.stringify(meetingInfo));
       

@@ -51,7 +51,8 @@ type ZoomSignatureResponse struct {
 
 // ConfigResponse 配置响应
 type ConfigResponse struct {
-	DisableJoinMeeting bool `json:"disable_join_meeting"`
+	DisableJoinMeeting bool   `json:"disable_join_meeting"`
+	ZoomApiKey         string `json:"zoom_api_key"`
 }
 
 // OAuthTokenResponse OAuth令牌响应
@@ -64,14 +65,14 @@ type OAuthTokenResponse struct {
 
 // CreateMeetingRequest 创建会议请求
 type CreateMeetingRequest struct {
-	Topic      string           `json:"topic"`
-	Type       int              `json:"type"`
-	StartTime  string           `json:"start_time,omitempty"`
-	Duration   int              `json:"duration,omitempty"`
-	Timezone   string           `json:"timezone,omitempty"`
-	Password   string           `json:"password,omitempty"`
-	Agenda     string           `json:"agenda,omitempty"`
-	Settings   *MeetingSettings `json:"settings,omitempty"`
+	Topic     string           `json:"topic"`
+	Type      int              `json:"type"`
+	StartTime string           `json:"start_time,omitempty"`
+	Duration  int              `json:"duration,omitempty"`
+	Timezone  string           `json:"timezone,omitempty"`
+	Password  string           `json:"password,omitempty"`
+	Agenda    string           `json:"agenda,omitempty"`
+	Settings  *MeetingSettings `json:"settings,omitempty"`
 }
 
 // MeetingSettings 会议设置

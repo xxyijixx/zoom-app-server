@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import JoinMeeting from './components/JoinMeeting'
 import CreateMeeting from './components/CreateMeeting'
@@ -6,30 +7,18 @@ import ZoomMeeting from './components/ZoomMeeting'
 import LeaveMeeting from './components/LeaveMeeting'
 import { ErrorProvider } from './contexts/ErrorContext'
 import ApiErrorInitializer from './components/ApiErrorInitializer'
-import type { ConfigResponse } from './types/api'
-import { ApiError } from './types/api'
-import { apiGet } from './utils/api'
+import { ConfigProvider, useConfig } from './contexts/ConfigContext'
 
 function App() {
-  const [config, setConfig] = useState<ConfigResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  return (
+    <ConfigProvider>
+      <AppContent />
+    </ConfigProvider>
+  );
+}
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const configData = await apiGet<ConfigResponse>('/api/config');
-        setConfig(configData);
-      } catch (err) {
-        console.error('Failed to fetch config:', err);
-        if (err instanceof ApiError) {
-          console.error('API Error:', err.code, err.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchConfig();
-  }, []);
+function AppContent() {
+  const { config, isLoading } = useConfig();
 
   if (isLoading) {
     return (

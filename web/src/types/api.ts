@@ -20,6 +20,7 @@ export interface ZoomSignatureResponse {
 // 配置响应数据
 export interface ConfigResponse {
   disable_join_meeting: boolean;
+  zoom_api_key: string
 }
 
 // 创建会议请求

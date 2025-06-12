@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ZoomMtg } from "@zoom/meetingsdk";
+import type { ZoomSignatureResponse } from '../types/api'
+import { apiPost } from '../utils/api';
 
 
 
@@ -137,24 +139,12 @@ const ZoomMeeting: React.FC = () => {
 
         // 获取签名
         console.log("正在获取签名...");
-        const response = await fetch("http://192.168.31.214:4000", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            meetingNumber: cleanMeetingNumber,
-            role: 0, // 0 表示参会者
-          }),
+        const response = await apiPost<ZoomSignatureResponse>("/api/signature", {
+          meetingNumber: cleanMeetingNumber,
+          role: 0, // 0 表示参会者
         });
 
-        if (!response.ok) {
-          throw new Error(
-            `获取签名失败: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const { signature } = await response.json();
+        const { signature } = response
         console.log("获取到的签名:", signature);
 
         // 加入会议

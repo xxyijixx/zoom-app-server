@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type {
   CreateMeetingRequest,
-  CreateMeetingResponse,
-  ConfigResponse
+  CreateMeetingResponse
 } from '../types/api';
 import { ApiError } from '../types/api';
-import { apiGet, apiPost } from '../utils/api';
+import { apiPost } from '../utils/api';
+import { useConfig } from '../contexts/ConfigContext';
 
 const CreateMeeting: React.FC = () => {
   const navigate = useNavigate();
@@ -20,22 +20,10 @@ const CreateMeeting: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdMeeting, setCreatedMeeting] = useState<CreateMeetingResponse | null>(null);
-  const [config, setConfig] = useState<ConfigResponse | null>(null);
+  const { config } = useConfig();
 
-  // 获取服务器配置和已保存的会议信息
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const configData = await apiGet<ConfigResponse>('/api/config');
-        setConfig(configData);
-      } catch (err) {
-        console.error('Failed to fetch config:', err);
-        if (err instanceof ApiError) {
-          console.error('API Error:', err.code, err.message);
-        }
-      }
-    };
-    
+  // 获取已保存的会议信息
+  useEffect(() => {    
     // 检查是否有已保存的会议信息
     const loadSavedMeeting = () => {
       try {
@@ -51,7 +39,6 @@ const CreateMeeting: React.FC = () => {
       }
     };
     
-    fetchConfig();
     loadSavedMeeting();
   }, []);
 
