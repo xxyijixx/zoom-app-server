@@ -53,7 +53,7 @@ func LoadConfig() *Config {
 		DisableDooTaskAuth: getEnv("DISABLE_DOOTASK_AUTH", "false") == "true",
 		// 日志配置
 		LogLevel:    getEnv("LOG_LEVEL", "info"),
-		LogFormat:   getEnv("LOG_FORMAT", "text"),
+		LogFormat:   getEnv("LOG_FORMAT", "json"),
 		LogOutput:   getEnv("LOG_OUTPUT", "file"),
 		LogFilePath: getEnv("LOG_FILE_PATH", "logs/app.log"),
 	}
